@@ -41,11 +41,11 @@ class ElevatorControlSystemSpec extends FunSpec with Matchers{
    el.downQueue should equal(TreeSet(5))
    (el.mode > 0) should be(true)
 
-   (1 to 6) foreach {_ => ecs.step()}
+   (1 to 5) foreach {_ => ecs.step()}
    ecs.update(1, 1)
    el.downQueue should equal(TreeSet(1))
 
-   (1 to 10) foreach {_ => ecs.step()}
+   (1 to 5) foreach {_ => ecs.step()}
    el.upQueue.isEmpty should be(true)
    el.downQueue.isEmpty should be(true)
    el.currentFloor should equal(1)
@@ -61,11 +61,11 @@ class ElevatorControlSystemSpec extends FunSpec with Matchers{
    el.upQueue should equal(TreeSet(1))
    (el.mode < 0) should be(true)
 
-   (1 to 8) foreach {_ => ecs.step()}
+   (1 to 5) foreach {_ => ecs.step()}
    ecs.update(1, 7)
    el.upQueue should equal(TreeSet(7))
 
-   (1 to 10) foreach {_ => ecs.step()}
+   (1 to 7) foreach {_ => ecs.step()}
    el.upQueue.isEmpty should be(true)
    el.downQueue.isEmpty should be(true)
    el.currentFloor should equal(7)
