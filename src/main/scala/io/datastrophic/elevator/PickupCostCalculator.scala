@@ -1,5 +1,9 @@
 package io.datastrophic.elevator
 
+import java.util
+
+import scala.collection.immutable.SortedSet
+
 trait PickupCostCalculator {
 
    def calculatePickupCost(elevator: Elevator, pickupFloor: Int, direction: Int): Int = {
@@ -7,6 +11,8 @@ trait PickupCostCalculator {
       val downQueue = elevator.downQueue
       val mode = elevator.mode
       val currentFloor = elevator.currentFloor
+      val top = getTopFloor(upQueue, downQueue)
+      val bottom = getBottomFloor(upQueue, downQueue)
 
       if(mode == 0){ //elevator in idle mode at any floor
          Math.abs(currentFloor - pickupFloor)
@@ -22,43 +28,50 @@ trait PickupCostCalculator {
             //pickup on the elevator way, passenger goes down, elevator goes up
             case (true, false, true) =>
                //get to the top and back to pickup
-               (upQueue.last - currentFloor) + Math.abs(upQueue.last - pickupFloor) + upQueue.size + downQueue.size
+               (top - currentFloor) + Math.abs(top - pickupFloor) + upQueue.size + downQueue.size
 
             //elevator passed pickup, passenger goes up, elevator goes down
             case (true, true, false) =>
                //get to the bottom and back to pickup
+               if (pickupFloor > top) {
+                  (currentFloor - bottom) + (pickupFloor - bottom) + upQueue.size + downQueue.size
+               } else {
+                  2 * (top - bottom) - (pickupFloor - currentFloor) + upQueue.size + downQueue.size
+               }
                (currentFloor - downQueue.head) + (pickupFloor - downQueue.head) + upQueue.size + downQueue.size
 
             //elevator passed pickup, passenger goes down, elevator goes down
             case (true, false, false) =>
                if(pickupFloor == currentFloor) {
                   upQueue.size + downQueue.size
-               } else if(pickupFloor >= upQueue.last){
-                  (currentFloor - downQueue.head) + (pickupFloor - downQueue.head) + upQueue.size + downQueue.size
                } else {
-                  (currentFloor - downQueue.head) + (upQueue.last - downQueue.head) + (upQueue.last - pickupFloor) + upQueue.size + downQueue.size
+                  if (pickupFloor > top) {
+                     (currentFloor - bottom) + (pickupFloor - bottom) + upQueue.size + downQueue.size
+                  } else {
+                     2 * (top - bottom) - (pickupFloor - currentFloor) + upQueue.size + downQueue.size
+                  }
                }
 
             //elevator passed the pickup floor, passenger goes up, elevator goes up
             case (false, true, true) =>
-               if(pickupFloor <= downQueue.head){
-                  (upQueue.last - currentFloor) + (upQueue.last - pickupFloor) + upQueue.size + downQueue.size
+               if (pickupFloor < bottom) {
+                  (top - currentFloor) + (top - pickupFloor) + upQueue.size + downQueue.size
                } else {
-                  (upQueue.last - currentFloor) + (upQueue.last - downQueue.head) + (pickupFloor - downQueue.head) + upQueue.size + downQueue.size
+                  2 * (top - bottom) - (currentFloor - pickupFloor) + upQueue.size + downQueue.size
                }
 
             //elevator passed the pickup floor, passenger goes down, elevator goes up
             case (false, false, true) =>
                //to the top and back, continue to pickup
-               (upQueue.last - currentFloor) + (upQueue.last - pickupFloor) + upQueue.size + downQueue.size
+               2*( top - currentFloor) + (currentFloor - pickupFloor) + upQueue.size + downQueue.size
 
             //pickup on the elevator way, passenger goes up, elevator goes down
             case (false, true, false) =>
                //get to the bottom and back, continue to pickup
-               if(pickupFloor <= downQueue.head){
-                  (currentFloor - Math.min(downQueue.head, pickupFloor)) + upQueue.size + downQueue.size
+               if(pickupFloor < bottom){
+                  (currentFloor - pickupFloor) + upQueue.size + downQueue.size
                } else {
-                  (currentFloor - downQueue.head) + (pickupFloor - downQueue.head) + upQueue.size + downQueue.size
+                  (currentFloor - bottom) + (pickupFloor - bottom) + upQueue.size + downQueue.size
                }
 
             //pickup on the elevator way, passenger goes down, elevator goes down
@@ -66,5 +79,25 @@ trait PickupCostCalculator {
                currentFloor - pickupFloor + upQueue.size + downQueue.size
          }
       }
+   }
+
+   def getTopFloor(upQ: SortedSet[Int], downQ: SortedSet[Int]): Int ={
+      if(upQ.nonEmpty && downQ.nonEmpty){
+         Math.max(upQ.last, downQ.last)
+      } else if(upQ.nonEmpty){
+         upQ.last
+      } else if(downQ.nonEmpty){
+         downQ.last
+      } else 0
+   }
+
+   def getBottomFloor(upQ: SortedSet[Int], downQ: SortedSet[Int]): Int ={
+      if(upQ.nonEmpty && downQ.nonEmpty){
+         Math.min(upQ.head, downQ.head)
+      } else if(upQ.nonEmpty){
+         upQ.head
+      } else if(downQ.nonEmpty){
+         downQ.head
+      } else 0
    }
 }

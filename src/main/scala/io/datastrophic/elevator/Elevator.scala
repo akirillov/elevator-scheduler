@@ -5,8 +5,8 @@ import scala.collection.immutable.SortedSet
 case class Elevator(id: Int,
                     currentFloor: Int = 0,
                     mode: Int = 0,
-                    upQueue: Set[Int] = SortedSet.empty[Int],
-                    downQueue: Set[Int] = SortedSet.empty[Int]) {
+                    upQueue: SortedSet[Int] = SortedSet.empty[Int],
+                    downQueue: SortedSet[Int] = SortedSet.empty[Int]) {
 
 
    def enqueuePickup(pickupFloor: Int, direction: Int): Elevator = {
@@ -23,5 +23,9 @@ case class Elevator(id: Int,
       if (mode == 0) {
          floor - currentFloor
       } else mode
+   }
+
+   override def toString: String = {
+      s"Elevator{ id: $id, floor: $currentFloor, mode: $mode, up: [${upQueue.mkString(",")}], down: [${downQueue.mkString(", ")}]}"
    }
 }

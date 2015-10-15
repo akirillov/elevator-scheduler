@@ -27,7 +27,11 @@ trait Simulator {
                   elevator.copy(mode = -1, currentFloor = candidate, upQueue = upQueue - candidate)
                }
             } else {
-               elevator.copy(currentFloor = candidate, upQueue = upQueue - candidate)
+               if(upQueue.last > candidate) {
+                  elevator.copy(currentFloor = candidate, upQueue = upQueue - candidate)
+               } else {
+                  elevator.copy(currentFloor = candidate, mode = -1, upQueue = upQueue - candidate)
+               }
             }
          }
       } else {
@@ -45,7 +49,11 @@ trait Simulator {
                   elevator.copy(mode = 1, currentFloor = candidate, downQueue = downQueue - candidate)
                }
             } else {
-               elevator.copy(currentFloor = candidate, downQueue = downQueue - candidate)
+               if(downQueue.head < candidate) {
+                  elevator.copy(currentFloor = candidate, downQueue = downQueue - candidate)
+               } else {
+                  elevator.copy(currentFloor = candidate, mode = 1, downQueue = downQueue - candidate)
+               }
             }
          }
       }
@@ -58,5 +66,4 @@ trait Simulator {
    def isLast(upQ: Set[Int], candidate: Int): Boolean = {
       (upQ - candidate).isEmpty
    }
-
 }

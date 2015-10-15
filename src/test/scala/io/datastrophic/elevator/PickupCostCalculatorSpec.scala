@@ -28,13 +28,13 @@ class PickupCostCalculatorSpec extends FunSpec with Matchers{
       it("should handle case: elevator passed pickup, passenger goes down, elevator goes down") {
          val e = Elevator(id = 1, mode = -1, currentFloor = 10, upQueue = TreeSet(7,13), downQueue = TreeSet(2,3))
          costCalculator.calculatePickupCost(e, 10, -1) should equal(4)
-         costCalculator.calculatePickupCost(e, 12, -1) should equal((10-2) + (13-2) + (13-12) + 4)
+         costCalculator.calculatePickupCost(e, 12, -1) should equal(2*(13-2) - (12-10)  + 4)
          costCalculator.calculatePickupCost(e, 15, -1) should equal((10-2) + (15-2) + 4)
       }
       it("should handle case: elevator passed pickup, passenger goes up, elevator goes up") {
          val e = Elevator(id = 1, mode = 1, currentFloor = 10, upQueue = TreeSet(7,13), downQueue = TreeSet(2,3))
-         costCalculator.calculatePickupCost(e, 9, 1) should equal((13-10) + (13-2) + (9-2) + 4)
-         costCalculator.calculatePickupCost(e, 1, 1) should equal((13-10) + (13-2) + (2-1) + 4)
+         costCalculator.calculatePickupCost(e, 9, 1) should equal(2*(13-2) - (10-9) + 4)
+         costCalculator.calculatePickupCost(e, 1, 1) should equal((13-10) + (13-1) + 4)
       }
       it("should handle case: elevator passed the pickup floor, passenger goes down, elevator goes up") {
          val e = Elevator(id = 1, mode = 1, currentFloor = 10, upQueue = TreeSet(7,13), downQueue = TreeSet(2,3))
